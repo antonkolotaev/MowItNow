@@ -67,9 +67,32 @@ object Player
 
     }
 
-    def concurrent(lawn: Lawn, mowers : Seq[Def]) : Seq[(Position, Orientation)] =
+    def concurrent(lawn: Lawn, mowers : Seq[Def], positions : Set[Position]) : Seq[Def] =
     {
-        mowers map { mower => (mower.position, mower.orientation) }
+        val (newMowers, newPositions) =
+            mowers.foldLeft((List.empty[Def], positions)) {
+                case ((result, forbidden), mower) =>
+
+                    mower.commands match {
+                        case Nil => (mower :: result, forbidden)
+                        case hd :: tl =>
+                            val forbiddenWithoutMe = forbidden - mower.position
+
+                            def positionAllowed(position: Position, newPosition : Position) = {
+                                lawn.isMoveAllowed(position, newPosition) && !(forbiddenWithoutMe contains newPosition)
+                            }
+
+                            val newMower = LawnMower(mower.position, mower.orientation) handle (hd, positionAllowed)
+
+                            (Def(newMower.position, newMower.orientation, tl) :: result, forbiddenWithoutMe + newMower.position)
+                    }
+
+            }
+
+        if (newMowers forall { _.commands.isEmpty })
+            newMowers.reverse
+        else
+            concurrent(lawn, newMowers.reverse, newPositions)
     }
 
 
@@ -89,7 +112,7 @@ object Player
                     case (f@Failure(_), _) => f
 
                 } map { positions =>
-                    concurrent(lawn, mowers)
+                    concurrent(lawn, mowers, positions) map { mower => (mower.position, mower.orientation) }
                 }
         }
     }
