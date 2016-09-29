@@ -41,7 +41,7 @@ object Player
 
     def positionsOf(tasks : Seq[Task]) = tasks map { _.mower.position }
 
-    def sequential(lawn: Lawn, tasks : Seq[Task], positions : Set[Position]) : Seq[Mower] =
+    private def sequentialImpl(lawn: Lawn, tasks : Seq[Task], positions : Set[Position]) : Seq[Mower] =
     {
         tasks.foldLeft((positions, List.empty[Mower])) {
 
@@ -67,10 +67,10 @@ object Player
         for (_         <- checkBounds(lawn, tasks);
              positions <- checkDuplicates(positionsOf(tasks))
         )
-            yield sequential(lawn, tasks, positions)
+            yield sequentialImpl(lawn, tasks, positions)
     }
 
-    def concurrent(lawn: Lawn, tasks : Seq[Task], positions : Set[Position]) : Seq[Task] =
+    private def concurrentImpl(lawn: Lawn, tasks : Seq[Task], positions : Set[Position]) : Seq[Task] =
     {
         val (newTasks, newPositions) =
             tasks.foldLeft((List.empty[Task], positions)) {
@@ -95,7 +95,7 @@ object Player
         if (newTasks forall { _.commands.isEmpty })
             newTasks.reverse
         else
-            concurrent(lawn, newTasks.reverse, newPositions)
+            concurrentImpl(lawn, newTasks.reverse, newPositions)
     }
 
 
@@ -104,7 +104,7 @@ object Player
         for (_         <- checkBounds(lawn, tasks);
              positions <- checkDuplicates(positionsOf(tasks))
         )
-            yield concurrent(lawn, tasks, positions) map { _.mower }
+            yield concurrentImpl(lawn, tasks, positions) map { _.mower }
     }
 
 }
