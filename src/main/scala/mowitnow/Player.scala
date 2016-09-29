@@ -9,10 +9,8 @@ object Player
     case class OutOfLawn(position : Position) extends Throwable { override def toString = s"initial mower position is out of lawn $position"}
     case class DuplicatePosition(position: Position) extends Throwable {override def toString = s"several mowers have same positions $position"}
 
-    def independent(upperRight : Position, mowers : Seq[Def]) : Try[Seq[(Position, Orientation)]] =
+    def independent(lawn: Lawn, mowers : Seq[Def]) : Try[Seq[(Position, Orientation)]] =
     {
-        val lawn = new Lawn(upperRight.x + 1, upperRight.y + 1)
-
         mowers find (m => !(lawn contains m.position)) match {
             case Some(outlier) => Failure(OutOfLawn(outlier.position))
             case None =>
@@ -26,10 +24,10 @@ object Player
         }
     }
 
-    def sequential(upperRight : Position, mowers : Seq[Def]) : Try[Seq[(Position, Orientation)]] =
-    {
-        val lawn = new Lawn(upperRight.x + 1, upperRight.y + 1)
 
+
+    def sequential(lawn: Lawn, mowers : Seq[Def]) : Try[Seq[(Position, Orientation)]] =
+    {
         mowers find (m => !(lawn contains m.position)) match {
             case Some(outlier) => Failure(OutOfLawn(outlier.position))
             case None =>
@@ -96,10 +94,8 @@ object Player
     }
 
 
-    def concurrent(upperRight : Position, mowers : Seq[Def]) : Try[Seq[(Position, Orientation)]] =
+    def concurrent(lawn: Lawn, mowers : Seq[Def]) : Try[Seq[(Position, Orientation)]] =
     {
-        val lawn = new Lawn(upperRight.x + 1, upperRight.y + 1)
-
         mowers find (m => !(lawn contains m.position)) match {
             case Some(outlier) => Failure(OutOfLawn(outlier.position))
             case None =>

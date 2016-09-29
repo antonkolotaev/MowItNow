@@ -5,12 +5,12 @@ import org.scalatest.{Matchers, FlatSpec}
 
 import scala.util.{Failure, Success, Try}
 
-class BaseSpec(player : (Position, Seq[Player.Def]) => Try[Seq[(Position, Orientation)]]) extends FlatSpec with Matchers {
+class BaseSpec(player : (Lawn, Seq[Player.Def]) => Try[Seq[(Position, Orientation)]]) extends FlatSpec with Matchers {
 
     def assignmentSpec = {
 
         player(
-            Position(5, 5), List(
+            Lawn fromUpperRight Position(5, 5), List(
                 Player.Def(Position(1, 2), Orientation.North,
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
                 Player.Def(Position(3, 3), Orientation.East,
@@ -26,7 +26,7 @@ class BaseSpec(player : (Position, Seq[Player.Def]) => Try[Seq[(Position, Orient
     def outOfLawnSpec = {
 
         player(
-            Position(5, 5), List(
+            Lawn fromUpperRight Position(5, 5), List(
                 Player.Def(Position(1, 2), Orientation.North,
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
                 Player.Def(Position(6, 3), Orientation.East,
@@ -41,7 +41,7 @@ class BaseSpec(player : (Position, Seq[Player.Def]) => Try[Seq[(Position, Orient
     def duplicateSpec = {
 
         Player.sequential(
-            Position(5,5), List(
+            Lawn fromUpperRight Position(5,5), List(
                 Player.Def(Position(1,2), Orientation.North,
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
                 Player.Def(Position(1,2), Orientation.East,

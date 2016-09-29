@@ -13,7 +13,7 @@ class ConcurrentSpec extends BaseSpec(Player.concurrent) {
     it should "bump into unprocessed mowers" in {
 
         Player.concurrent(
-            Position(5,5), List(
+            Lawn fromUpperRight Position(5,5), List(
                 Player.Def(Position(1,2), Orientation.East,
                     List(Forward, Forward, Left, Forward)),
                 Player.Def(Position(4,2), Orientation.West,
@@ -31,7 +31,7 @@ class ConcurrentSpec extends BaseSpec(Player.concurrent) {
     it should "bump into processed mowers" in {
 
         Player.concurrent(
-            Position(5,5), List(
+            Lawn fromUpperRight Position(5,5), List(
                 Player.Def(Position(1,2), Orientation.East,
                     List(Forward, Forward, Left, Forward)),
                 Player.Def(Position(3,2), Orientation.West,

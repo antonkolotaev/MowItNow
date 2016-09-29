@@ -13,7 +13,7 @@ class SequentialSpec extends BaseSpec(Player.sequential) {
     it should "bump into unprocessed mowers" in {
 
         Player.sequential(
-            Position(5,5), List(
+            Lawn fromUpperRight Position(5,5), List(
                 Player.Def(Position(1,2), Orientation.North,
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
                 Player.Def(Position(0,1), Orientation.East,
@@ -30,7 +30,7 @@ class SequentialSpec extends BaseSpec(Player.sequential) {
     it should "bump into processed mowers" in {
 
         Player.sequential(
-            Position(5,5), List(
+            Lawn fromUpperRight Position(5,5), List(
                 Player.Def(Position(0,1), Orientation.East,
                     List()),
                 Player.Def(Position(1,2), Orientation.North,
