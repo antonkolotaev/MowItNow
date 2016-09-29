@@ -1,6 +1,6 @@
 package mowitnow
 
-case class LawnMower(position: Position, orientation: Orientation)
+case class Mower(position: Position, orientation: Orientation)
 {
     def left  = copy(orientation = orientation.left)
     def right = copy(orientation = orientation.right)

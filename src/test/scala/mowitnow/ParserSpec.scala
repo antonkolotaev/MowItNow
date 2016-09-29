@@ -32,7 +32,7 @@ class ParserSpec extends FlatSpec with Matchers with Parser {
     }
 
     "5 7 N " should "give initial position and orientation" in  {
-        test(parseAll(initial, "5 7 N\n"), (Position(5,7), Orientation.North))
+        test(parseAll(initial, "5 7 N\n"), Mower(Position(5,7), Orientation.North))
     }
 
     "G" should "give Left" in {
@@ -44,15 +44,15 @@ class ParserSpec extends FlatSpec with Matchers with Parser {
     }
 
     "5 7 N | GADD" should "define a mower" in  {
-        test(parseAll(mower, "5 7 N\nGADD"), Player.Def(Position(5,7), Orientation.North, List(Left, Forward, Right, Right)))
+        test(parseAll(mower, "5 7 N\nGADD"), Player.Def(Mower(Position(5,7), Orientation.North), List(Left, Forward, Right, Right)))
     }
 
     "9 9 | 5 7 N | GADD | 2 5 W | D " should "define a game" in  {
         test(parseAll(all, "9 9\n5 7 N\nGADD\n2 5 W\nD"),
             (Position(9,9),
                 List(
-                    Player.Def(Position(5,7), Orientation.North, List(Left, Forward, Right, Right)),
-                    Player.Def(Position(2,5), Orientation.West, List(Right)))))
+                    Player.Def(Mower(Position(5,7), Orientation.North), List(Left, Forward, Right, Right)),
+                    Player.Def(Mower(Position(2,5), Orientation.West), List(Right)))))
 
     }
 
@@ -68,7 +68,7 @@ class ParserSpec extends FlatSpec with Matchers with Parser {
         test(parseAll(all, s),
             (Position(5,5),
                 List(
-                    Player.Def(Position(1,2), Orientation.North, List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
-                    Player.Def(Position(3,3), Orientation.East, List(Forward, Forward, Right, Forward, Forward, Right, Forward, Right, Right, Forward)))))
+                    Player.Def(Mower(Position(1,2), Orientation.North), List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
+                    Player.Def(Mower(Position(3,3), Orientation.East), List(Forward, Forward, Right, Forward, Forward, Right, Forward, Right, Right, Forward)))))
     }
 }

@@ -14,13 +14,13 @@ class ConcurrentSpec extends BaseSpec(Player.concurrent) {
 
         Player.concurrent(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Position(1,2), Orientation.East,
+                Player.Def(Mower(Position(1,2), Orientation.East),
                     List(Forward, Forward, Left, Forward)),
-                Player.Def(Position(4,2), Orientation.West,
+                Player.Def(Mower(Position(4,2), Orientation.West),
                     List(Forward, Forward, Forward, Forward, Forward)))) match
         {
             case Success(result) =>
-                result should contain theSameElementsInOrderAs List((Position(2,3), Orientation.North), (Position(1,2), Orientation.West))
+                result should contain theSameElementsInOrderAs List(Mower(Position(2,3), Orientation.North), Mower(Position(1,2), Orientation.West))
             case Failure(_) =>
                 assert(false)
         }
@@ -32,13 +32,13 @@ class ConcurrentSpec extends BaseSpec(Player.concurrent) {
 
         Player.concurrent(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Position(1,2), Orientation.East,
+                Player.Def(Mower(Position(1,2), Orientation.East),
                     List(Forward, Forward, Left, Forward)),
-                Player.Def(Position(3,2), Orientation.West,
+                Player.Def(Mower(Position(3,2), Orientation.West),
                     List(Forward, Forward, Forward, Forward, Forward)))) match
         {
             case Success(result) =>
-                result should contain theSameElementsInOrderAs List((Position(2,3), Orientation.North), (Position(1,2), Orientation.West))
+                result should contain theSameElementsInOrderAs List(Mower(Position(2,3), Orientation.North), Mower(Position(1,2), Orientation.West))
             case Failure(_) =>
                 assert(false)
         }

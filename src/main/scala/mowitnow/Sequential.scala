@@ -15,9 +15,9 @@ object Sequential extends Parser {
                 parseAll(all, text) match {
                     case Success((upperRight, mowers), _) =>
                         Player.sequential(Lawn fromUpperRight upperRight, mowers) match {
-                            case scala.util.Success(positions) =>
-                                positions foreach { case (position, orientation) =>
-                                    println(s"${position.x} ${position.y} $orientation")
+                            case scala.util.Success(mowers) =>
+                                mowers foreach { mower =>
+                                    println(s"${mower.position.x} ${mower.position.y} ${mower.orientation}")
                                 }
                             case scala.util.Failure(ex) =>
                                 println("Error: " + ex)

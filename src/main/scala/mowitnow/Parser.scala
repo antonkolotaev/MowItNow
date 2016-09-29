@@ -24,8 +24,8 @@ trait Parser extends JavaTokenParsers with PackratParsers {
 
     def orientation = (east | north | west | south) withFailureMessage "orientation expected"
 
-    def initial = ((position <~ whitespace) ~ (orientation <~ whitespaceNL) ^^ { case pos ~ orient => (pos,orient) }
-        ) withFailureMessage "initial position and orientation expected"
+    def initial = ((position <~ whitespace) ~ (orientation <~ whitespaceNL) ^^ { case pos ~ orient => Mower(pos,orient) }
+        ) withFailureMessage "initial mower position and orientation expected"
 
     def forward = "A" ^^ { _ => Forward }
     def left    = "G" ^^ { _ => Left }
@@ -35,7 +35,7 @@ trait Parser extends JavaTokenParsers with PackratParsers {
 
     def commands = opt(whitespace) ~> rep(command) <~ opt(whitespace)
 
-    def mower = ((initial ~ commands) ^^ {case (pos, orient) ~ cmds => Player.Def(pos, orient, cmds)}
+    def mower = ((initial ~ commands) ^^ {case mower ~ cmds => Player.Def(mower, cmds)}
         ) withFailureMessage "mower definition expected"
 
     def all = (toStrip ~> (dimensions ~ repsep(mower, "\n") <~ toStrip) ^^ { case dims ~ mowers => (dims, mowers) }
