@@ -3,7 +3,7 @@ package mowitnow
 import scala.io.Source
 import scala.util.Try
 
-object Sequential extends Parser {
+object Driver extends Parser {
 
     object Modes extends Enumeration {
         type Modes = Value

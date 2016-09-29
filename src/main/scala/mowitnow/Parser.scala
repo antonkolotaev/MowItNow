@@ -10,12 +10,12 @@ trait Parser extends JavaTokenParsers with PackratParsers {
     def whitespaceNL = """[ \t]*\n""".r
     def toStrip = """[ \t\n]*""".r
 
-    def integer : Parser[Int]    = ("""([0-9]\d*)""".r ^^ { _.toInt }) withFailureMessage "integer expected"
+    def integer = ("""([0-9]\d*)""".r ^^ { _.toInt }) withFailureMessage "integer expected"
 
     def position = (((opt(whitespace) ~> integer <~ whitespace) ~ integer) ^^ { case x ~ y  => Position(x,y) }
         ) withFailureMessage "position expected"
 
-    def dimensions : Parser[Position] = position <~ whitespaceNL
+    def dimensions = position <~ whitespaceNL
 
     def east  = "E" ^^ { _ => Orientation.East }
     def north = "N" ^^ { _ => Orientation.North }

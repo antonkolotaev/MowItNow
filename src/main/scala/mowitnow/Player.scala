@@ -4,11 +4,37 @@ import scala.util.{Failure, Success, Try}
 
 object Player
 {
+    /**
+     * Input definition for a mower
+     * @param mower - initial position and orientation of mower
+     * @param commands - commands to be played
+     */
     case class Task(mower: Mower, commands : Seq[Command])
 
-    case class OutOfLawn(position : Position) extends Throwable { override def toString = s"initial mower position is out of lawn $position"}
-    case class DuplicatePosition(position: Position) extends Throwable {override def toString = s"several mowers have same positions $position"}
+    /**
+     * Error class signaling that initial position of a mower is out of lawn
+     * @param position incorrect mower position
+     */
+    case class OutOfLawn(position : Position) extends Throwable
+    {
+        override def toString = s"initial mower position is out of lawn $position"
+    }
 
+    /**
+     * Error class signaling that two mowers have the same initial positions
+     * @param position incorrect mower position
+     */
+    case class DuplicatePosition(position: Position) extends Throwable
+    {
+        override def toString = s"several mowers have same positions $position"
+    }
+
+    /**
+     * Moves mowers absolutely independently without any respect to other mowers
+     * @param lawn lawn where mowers to be moved
+     * @param tasks mowers and their commands
+     * @return Success(final position and orientation for every mower); Failure(_) otherwise
+     */
     def independent(lawn: Lawn, tasks : Seq[Task]) : Try[Seq[Mower]] =
     {
         for (_ <- checkBounds(lawn, tasks))
@@ -62,6 +88,16 @@ object Player
         }._2.reverse
     }
 
+    /**
+     * Moves mowers sequentially:
+     *  1. Put all mowers into the lawn
+     *  2. Check that all have different positions and these positions are inside of the lawn
+     *  3. Play commands for i-th (i in 0..tasks.length) mower taking into account positions of other mowers
+     *
+     * @param lawn lawn where mowers to be moved
+     * @param tasks mowers and their commands
+     * @return Success(final position and orientation for every mower); Failure(_) otherwise
+     */
     def sequential(lawn: Lawn, tasks : Seq[Task]) : Try[Seq[Mower]] =
     {
         for (_         <- checkBounds(lawn, tasks);
@@ -99,6 +135,17 @@ object Player
     }
 
 
+    /**
+     * Moves mowers concurrently:
+     *  1. Put all mowers into the lawn
+     *  2. Check that all have different positions and these positions are inside of the lawn
+     *  3. Play the first command for i-th (i in 0..tasks.length) mower taking into account positions of other mowers
+     *  4. Repeat step 3 until all mowers have no commands to replay
+     *
+     * @param lawn lawn where mowers to be moved
+     * @param tasks mowers and their commands
+     * @return Success(final position and orientation for every mower); Failure(_) otherwise
+     */
     def concurrent(lawn: Lawn, tasks : Seq[Task]) : Try[Seq[Mower]] =
     {
         for (_         <- checkBounds(lawn, tasks);
