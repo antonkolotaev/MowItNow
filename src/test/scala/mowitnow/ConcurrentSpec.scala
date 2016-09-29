@@ -14,9 +14,9 @@ class ConcurrentSpec extends BaseSpec(Player.concurrent) {
 
         Player.concurrent(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Mower(Position(1,2), Orientation.East),
+                Player.Task(Mower(Position(1,2), Orientation.East),
                     List(Forward, Forward, Left, Forward)),
-                Player.Def(Mower(Position(4,2), Orientation.West),
+                Player.Task(Mower(Position(4,2), Orientation.West),
                     List(Forward, Forward, Forward, Forward, Forward)))) match
         {
             case Success(result) =>
@@ -32,9 +32,9 @@ class ConcurrentSpec extends BaseSpec(Player.concurrent) {
 
         Player.concurrent(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Mower(Position(1,2), Orientation.East),
+                Player.Task(Mower(Position(1,2), Orientation.East),
                     List(Forward, Forward, Left, Forward)),
-                Player.Def(Mower(Position(3,2), Orientation.West),
+                Player.Task(Mower(Position(3,2), Orientation.West),
                     List(Forward, Forward, Forward, Forward, Forward)))) match
         {
             case Success(result) =>

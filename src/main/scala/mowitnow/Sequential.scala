@@ -13,8 +13,8 @@ object Sequential extends Parser {
                 val text = Source.fromFile(args(0)).getLines() mkString "\n"
 
                 parseAll(all, text) match {
-                    case Success((upperRight, mowers), _) =>
-                        Player.sequential(Lawn fromUpperRight upperRight, mowers) match {
+                    case Success((upperRight, tasks), _) =>
+                        Player.sequential(Lawn fromUpperRight upperRight, tasks) match {
                             case scala.util.Success(mowers) =>
                                 mowers foreach { mower =>
                                     println(s"${mower.position.x} ${mower.position.y} ${mower.orientation}")

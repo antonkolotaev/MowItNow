@@ -4,35 +4,35 @@ import scala.util.{Failure, Success, Try}
 
 object Player
 {
-    case class Def(mower: Mower, commands : Seq[Command])
+    case class Task(mower: Mower, commands : Seq[Command])
 
     case class OutOfLawn(position : Position) extends Throwable { override def toString = s"initial mower position is out of lawn $position"}
     case class DuplicatePosition(position: Position) extends Throwable {override def toString = s"several mowers have same positions $position"}
 
-    def independent(lawn: Lawn, mowers : Seq[Def]) : Try[Seq[Mower]] =
+    def independent(lawn: Lawn, tasks : Seq[Task]) : Try[Seq[Mower]] =
     {
-        for (_ <- checkBounds(lawn, mowers))
-            yield mowers map { mower =>
+        for (_ <- checkBounds(lawn, tasks))
+            yield tasks map { mower =>
                     mower.commands.foldLeft(mower.mower) {
                         (mower, command) => mower handle(command, lawn.isMoveAllowed)
                     }
             }
     }
 
-    def checkBounds(lawn: Lawn, mowers : Seq[Def]) : Try[Unit] =
+    def checkBounds(lawn: Lawn, tasks : Seq[Task]) : Try[Unit] =
     {
-        mowers find (m => !(lawn contains m.mower.position)) match {
+        tasks find (task => !(lawn contains task.mower.position)) match {
             case Some(outlier) => Failure(OutOfLawn(outlier.mower.position))
             case None => Success(())
         }
     }
 
-    def sequential(lawn: Lawn, mowers : Seq[Def]) : Try[Seq[Mower]] =
+    def sequential(lawn: Lawn, tasks : Seq[Task]) : Try[Seq[Mower]] =
     {
-        mowers find (m => !(lawn contains m.mower.position)) match {
+        tasks find (task => !(lawn contains task.mower.position)) match {
             case Some(outlier) => Failure(OutOfLawn(outlier.mower.position))
             case None =>
-                mowers.foldLeft(Success(Set.empty[Position]) : Try[Set[Position]]) {
+                tasks.foldLeft(Success(Set.empty[Position]) : Try[Set[Position]]) {
                     case (Success(ps), m) =>
                         if (ps contains m.mower.position)
                             Failure(DuplicatePosition(m.mower.position))
@@ -42,17 +42,17 @@ object Player
 
                 } map { positions =>
 
-                        mowers.foldLeft((positions, List.empty[Mower])) {
+                        tasks.foldLeft((positions, List.empty[Mower])) {
 
-                            case ((ps, processedMowers), mower) =>
+                            case ((ps, processedMowers), task) =>
 
-                                val positionsWithoutMe = ps - mower.mower.position
+                                val positionsWithoutMe = ps - task.mower.position
 
                                 def positionAllowed(position: Position, newPosition : Position) = {
                                     lawn.isMoveAllowed(position, newPosition) && !(positionsWithoutMe contains newPosition)
                                 }
 
-                                val newMower = mower.commands.foldLeft(mower.mower) {
+                                val newMower = task.commands.foldLeft(task.mower) {
                                     (mower, command) => mower handle (command, positionAllowed)
                                 }
 
@@ -65,50 +65,50 @@ object Player
 
     }
 
-    def concurrent(lawn: Lawn, mowers : Seq[Def], positions : Set[Position]) : Seq[Def] =
+    def concurrent(lawn: Lawn, tasks : Seq[Task], positions : Set[Position]) : Seq[Task] =
     {
-        val (newMowers, newPositions) =
-            mowers.foldLeft((List.empty[Def], positions)) {
-                case ((result, forbidden), mower) =>
+        val (newTasks, newPositions) =
+            tasks.foldLeft((List.empty[Task], positions)) {
+                case ((result, forbidden), task) =>
 
-                    mower.commands match {
-                        case Nil => (mower :: result, forbidden)
-                        case hd :: tl =>
-                            val forbiddenWithoutMe = forbidden - mower.mower.position
+                    task.commands match {
+                        case Nil => (task :: result, forbidden)
+                        case currentCommand :: commandsToProcess =>
+                            val forbiddenWithoutMe = forbidden - task.mower.position
 
                             def positionAllowed(position: Position, newPosition : Position) = {
                                 lawn.isMoveAllowed(position, newPosition) && !(forbiddenWithoutMe contains newPosition)
                             }
 
-                            val newMower = mower.mower handle (hd, positionAllowed)
+                            val newMower = task.mower handle (currentCommand, positionAllowed)
 
-                            (Def(newMower, tl) :: result, forbiddenWithoutMe + newMower.position)
+                            (Task(newMower, commandsToProcess) :: result, forbiddenWithoutMe + newMower.position)
                     }
 
             }
 
-        if (newMowers forall { _.commands.isEmpty })
-            newMowers.reverse
+        if (newTasks forall { _.commands.isEmpty })
+            newTasks.reverse
         else
-            concurrent(lawn, newMowers.reverse, newPositions)
+            concurrent(lawn, newTasks.reverse, newPositions)
     }
 
 
-    def concurrent(lawn: Lawn, mowers : Seq[Def]) : Try[Seq[Mower]] =
+    def concurrent(lawn: Lawn, tasks : Seq[Task]) : Try[Seq[Mower]] =
     {
-        mowers find (m => !(lawn contains m.mower.position)) match {
+        tasks find (task => !(lawn contains task.mower.position)) match {
             case Some(outlier) => Failure(OutOfLawn(outlier.mower.position))
             case None =>
-                mowers.foldLeft(Success(Set.empty[Position]): Try[Set[Position]]) {
-                    case (Success(ps), m) =>
-                        if (ps contains m.mower.position)
-                            Failure(DuplicatePosition(m.mower.position))
+                tasks.foldLeft(Success(Set.empty[Position]): Try[Set[Position]]) {
+                    case (Success(ps), task) =>
+                        if (ps contains task.mower.position)
+                            Failure(DuplicatePosition(task.mower.position))
                         else
-                            Success(ps + m.mower.position)
+                            Success(ps + task.mower.position)
                     case (f@Failure(_), _) => f
 
                 } map { positions =>
-                    concurrent(lawn, mowers, positions) map { mower => mower.mower }
+                    concurrent(lawn, tasks, positions) map { _.mower }
                 }
         }
     }

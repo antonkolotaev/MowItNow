@@ -5,15 +5,15 @@ import org.scalatest.{Matchers, FlatSpec}
 
 import scala.util.{Failure, Success, Try}
 
-class BaseSpec(player : (Lawn, Seq[Player.Def]) => Try[Seq[Mower]]) extends FlatSpec with Matchers {
+class BaseSpec(player : (Lawn, Seq[Player.Task]) => Try[Seq[Mower]]) extends FlatSpec with Matchers {
 
     def assignmentSpec = {
 
         player(
             Lawn fromUpperRight Position(5, 5), List(
-                Player.Def(Mower(Position(1, 2), Orientation.North),
+                Player.Task(Mower(Position(1, 2), Orientation.North),
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
-                Player.Def(Mower(Position(3, 3), Orientation.East),
+                Player.Task(Mower(Position(3, 3), Orientation.East),
                     List(Forward, Forward, Right, Forward, Forward, Right, Forward, Right, Right, Forward)))) match {
             case Success(result) =>
                 result should contain theSameElementsInOrderAs List(Mower(Position(1, 3), Orientation.North), Mower(Position(5, 1), Orientation.East))
@@ -27,9 +27,9 @@ class BaseSpec(player : (Lawn, Seq[Player.Def]) => Try[Seq[Mower]]) extends Flat
 
         player(
             Lawn fromUpperRight Position(5, 5), List(
-                Player.Def(Mower(Position(1, 2), Orientation.North),
+                Player.Task(Mower(Position(1, 2), Orientation.North),
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
-                Player.Def(Mower(Position(6, 3), Orientation.East),
+                Player.Task(Mower(Position(6, 3), Orientation.East),
                     List(Forward, Forward, Right, Forward, Forward, Right, Forward, Right, Right, Forward)))) match {
             case Failure(ex) =>
                 ex should be(OutOfLawn(Position(6, 3)))
@@ -42,11 +42,11 @@ class BaseSpec(player : (Lawn, Seq[Player.Def]) => Try[Seq[Mower]]) extends Flat
 
         Player.sequential(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Mower(Position(1,2), Orientation.North),
+                Player.Task(Mower(Position(1,2), Orientation.North),
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
-                Player.Def(Mower(Position(1,2), Orientation.East),
+                Player.Task(Mower(Position(1,2), Orientation.East),
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
-                Player.Def(Mower(Position(3,3), Orientation.East),
+                Player.Task(Mower(Position(3,3), Orientation.East),
                     List(Forward, Forward, Right, Forward, Forward, Right, Forward, Right, Right, Forward)))) match
         {
             case Failure(ex) =>

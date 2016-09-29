@@ -14,9 +14,9 @@ class SequentialSpec extends BaseSpec(Player.sequential) {
 
         Player.sequential(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Mower(Position(1,2), Orientation.North),
+                Player.Task(Mower(Position(1,2), Orientation.North),
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)),
-                Player.Def(Mower(Position(0,1), Orientation.East),
+                Player.Task(Mower(Position(0,1), Orientation.East),
                     List(Forward, Forward, Right, Forward, Forward, Right, Forward, Right, Right, Forward)))) match
         {
             case Success(result) =>
@@ -31,9 +31,9 @@ class SequentialSpec extends BaseSpec(Player.sequential) {
 
         Player.sequential(
             Lawn fromUpperRight Position(5,5), List(
-                Player.Def(Mower(Position(0,1), Orientation.East),
+                Player.Task(Mower(Position(0,1), Orientation.East),
                     List()),
-                Player.Def(Mower(Position(1,2), Orientation.North),
+                Player.Task(Mower(Position(1,2), Orientation.North),
                     List(Left, Forward, Left, Forward, Left, Forward, Left, Forward, Forward)))
         ) match {
             case Success(result) =>
